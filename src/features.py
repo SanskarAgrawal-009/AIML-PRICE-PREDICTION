@@ -1,8 +1,3 @@
-"""Feature engineering utilities: returns, direction labels, lags, and technical indicators.
-
-The module adds SMA/EMA, RSI, MACD, Bollinger Bands, rolling volatility and provides
-`prepare_for_classification` which returns X,y ready for model training.
-"""
 import pandas as pd
 import numpy as np
 
@@ -38,11 +33,7 @@ def add_lags(df, cols=['Close'], n_lags=5):
 
 
 def _resolve_price_col(df, preferred='Close'):
-    """Return the column name to use for price-sensitive calculations.
 
-    It tries the preferred name first, then several common alternatives (case-insensitive).
-    Raises KeyError if no suitable price column is found.
-    """
     cols = list(df.columns)
     lower_map = {c.lower().strip(): c for c in cols}
     candidates = [preferred, 'close', 'adj close', 'adjusted close', 'last', 'close_price', 'close*']

@@ -1,4 +1,4 @@
-"""Train advanced models (RandomForest, XGBoost) per ticker and save metrics + feature importances."""
+
 import os
 from pathlib import Path
 import json
@@ -35,7 +35,7 @@ def train_models_for_csv(csv_path, out_dir='models_advanced', n_splits=5, tune=F
     tscv = TimeSeriesSplit(n_splits=n_splits)
     rf_fold_metrics = []
     xgb_fold_metrics = []
-    # evaluate with simple fixed models across folds
+
     for train_idx, test_idx in tscv.split(X):
         X_train, X_test = X.iloc[train_idx], X.iloc[test_idx]
         y_train, y_test = y.iloc[train_idx], y.iloc[test_idx]
@@ -67,7 +67,7 @@ def train_models_for_csv(csv_path, out_dir='models_advanced', n_splits=5, tune=F
     Path(out_dir).mkdir(parents=True, exist_ok=True)
     results = {'ticker': ticker, 'rf': {'folds': rf_fold_metrics},}
 
-    # Optionally tune on full data (time-series-aware tuning would require custom CV; we use TimeSeriesSplit here)
+
     if tune:
         print(f'Tuning RandomForest for {ticker} (n_iter={n_iter})')
         param_dist_rf = {
@@ -88,7 +88,7 @@ def train_models_for_csv(csv_path, out_dir='models_advanced', n_splits=5, tune=F
     joblib.dump(rf_final, rf_path)
     results['rf']['model_path'] = str(rf_path)
 
-    # save feature importances
+
     if save_importances and hasattr(rf_final, 'feature_importances_'):
         fi = pd.Series(rf_final.feature_importances_, index=X.columns).sort_values(ascending=False)
         if top_k:
@@ -132,7 +132,7 @@ def main(data_dir='data/raw', out_dir='models_advanced', tune=False, n_iter=10, 
                 all_results.append(res)
         except Exception as e:
             print('Failed', csv.name, e)
-    # write results
+
     Path(out_dir).mkdir(parents=True, exist_ok=True)
     with open(Path(out_dir)/'advanced_metrics.json', 'w') as f:
         json.dump(all_results, f, indent=2)
